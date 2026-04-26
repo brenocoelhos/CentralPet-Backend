@@ -24,7 +24,7 @@ public class LoginController {
 
     @PostMapping("/login")
     public ResponseEntity<String> login(@Valid @RequestBody LoginDto loginDto) {
-        String resultado = loginService.login(loginDto.getUsername(), loginDto.getPassword());
+        String resultado = loginService.login(loginDto.getEmail(), loginDto.getSenha());
         return ResponseEntity.ok(resultado);
     }
 
@@ -32,7 +32,6 @@ public class LoginController {
     public ResponseEntity<String> cadastro(@Valid @RequestBody CadastroDto cadastroDto) {
         Usuario usuario = usuarioService.cadastrar(cadastroDto);
         return ResponseEntity.status(HttpStatus.CREATED)
-                .body("Usuário cadastrado com sucesso: " + usuario.getUsername());
+                .body("Usuário cadastrado com sucesso: " + usuario.getNome());
     }
 }
-

@@ -16,14 +16,14 @@ public class LoginService {
         this.passwordEncoder = passwordEncoder;
     }
 
-    public String login(String username, String password) {
-        Usuario usuario = usuarioRepository.findByUsername(username)
+    public String login(String email, String senha) {
+        Usuario usuario = usuarioRepository.findByEmail(email)
                 .orElseThrow(() -> new IllegalArgumentException("Usuário não encontrado"));
 
-        if (!passwordEncoder.matches(password, usuario.getSenha())) {
+        if (!passwordEncoder.matches(senha, usuario.getSenha())) {
             throw new IllegalArgumentException("Senha incorreta");
         }
 
-        return "Usuário autenticado: " + usuario.getUsername();
+        return "Usuário autenticado: " + usuario.getNome();
     }
 }

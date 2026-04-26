@@ -6,6 +6,8 @@ import br.com.cetral.centralpet.repository.UsuarioRepository;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import java.util.UUID;
+
 @Service
 public class UsuarioService {
 
@@ -18,17 +20,25 @@ public class UsuarioService {
     }
 
     public Usuario cadastrar(CadastroDto dto) {
-        if (usuarioRepository.existsByUsername(dto.getUsername())) {
-            throw new IllegalArgumentException("Username já está em uso");
-        }
         if (usuarioRepository.existsByEmail(dto.getEmail())) {
             throw new IllegalArgumentException("Email já está cadastrado");
         }
+        if (usuarioRepository.existsByCpf(dto.getCpf())) {
+            throw new IllegalArgumentException("CPF já está cadastrado");
+        }
+        if (usuarioRepository.existsByTelefone(dto.getTelefone())) {
+            throw new IllegalArgumentException("Telefone já está cadastrado");
+        }
 
         Usuario usuario = new Usuario();
-        usuario.setUsername(dto.getUsername());
+        usuario.setId(UUID.randomUUID().toString());
+        usuario.setNome(dto.getNome());
+        usuario.setCpf(dto.getCpf());
+        usuario.setDataNascimento(dto.getDataNascimento());
         usuario.setEmail(dto.getEmail());
         usuario.setSenha(passwordEncoder.encode(dto.getSenha()));
+        usuario.setTelefone(dto.getTelefone());
+        usuario.setEndereco(dto.getEndereco());
 
         return usuarioRepository.save(usuario);
     }
