@@ -13,7 +13,8 @@ import java.util.List;
 @Service
 public class CadastroPetService {
 
-    private static final String CHIP_DELIMITER = "||";
+    private static final String CHIP_DELIMITER = "::";
+    private static final String LEGACY_CHIP_DELIMITER = "||";
 
     private final PetRepository petRepository;
     private final UsuarioRepository usuarioRepository;
@@ -78,7 +79,8 @@ public class CadastroPetService {
         }
 
         String texto = descricao.trim();
-        return normalizarChipsDescricao(List.of(texto.split("\\Q" + CHIP_DELIMITER + "\\E")));
+        String delimitador = texto.contains(CHIP_DELIMITER) ? CHIP_DELIMITER : LEGACY_CHIP_DELIMITER;
+        return normalizarChipsDescricao(List.of(texto.split(java.util.regex.Pattern.quote(delimitador))));
     }
 
     private List<String> normalizarChipsDescricao(List<String> chipsDescricao) {
