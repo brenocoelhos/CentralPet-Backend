@@ -1,6 +1,7 @@
 package br.com.cetral.centralpet.dto;
 
 import java.time.LocalDate;
+import java.util.List;
 
 public record PetDashboardDto(
         Long id,
@@ -11,7 +12,7 @@ public record PetDashboardDto(
         String porte,
         LocalDate dataDesaparecimento,
         String localDesaparecimento,
-        String descricao,
+        List<String> descricao,
         String fotoUrl,
         String nomeTutor,
         String telefoneTutor,

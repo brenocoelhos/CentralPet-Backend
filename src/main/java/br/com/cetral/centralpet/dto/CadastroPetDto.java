@@ -8,6 +8,7 @@ import lombok.Getter;
 import lombok.Setter;
 
 import java.time.LocalDate;
+import java.util.List;
 
 @Getter
 @Setter
@@ -41,8 +42,9 @@ public class CadastroPetDto {
     @Size(max = 300, message = "Local do desaparecimento deve ter no máximo 300 caracteres")
     private String localDesaparecimento;
 
-    @Size(max = 2000, message = "Descrição deve ter no máximo 2000 caracteres")
-    private String descricao;
+    @Size(max = 20, message = "Descrição pode conter no máximo 20 chips")
+    private List<@NotBlank(message = "Cada chip da descrição deve ser preenchido")
+            @Size(max = 80, message = "Cada chip da descrição deve ter no máximo 80 caracteres") String> descricao;
 
     @Size(max = 500, message = "URL da foto deve ter no máximo 500 caracteres")
     private String fotoUrl;

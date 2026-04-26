@@ -13,6 +13,8 @@ import java.util.List;
 @Service
 public class CadastroPetService {
 
+    private static final String CHIP_DELIMITER = "||";
+
     private final PetRepository petRepository;
     private final UsuarioRepository usuarioRepository;
 
@@ -29,7 +31,7 @@ public class CadastroPetService {
                 dto.getUsuarioId(),
                 dto.getNome().trim(),
                 dto.getDataDesaparecimento(),
-                dto.getEspecie()
+                dto.getEspecie().trim()
         );
 
         if (anuncioDuplicado) {
@@ -45,7 +47,7 @@ public class CadastroPetService {
         pet.setPorte(normalizarOpcional(dto.getPorte()));
         pet.setDataDesaparecimento(dto.getDataDesaparecimento());
         pet.setLocalDesaparecimento(dto.getLocalDesaparecimento().trim());
-        pet.setDescricao(normalizarOpcional(dto.getDescricao()));
+        pet.setDescricao(serializarDescricao(dto.getDescricao()));
         pet.setFotoUrl(normalizarOpcional(dto.getFotoUrl()));
         pet.setNomeTutor(dto.getNomeTutor().trim());
         pet.setTelefoneTutor(dto.getTelefoneTutor().trim());
@@ -59,6 +61,35 @@ public class CadastroPetService {
         }
         String valorNormalizado = valor.trim();
         return valorNormalizado.isEmpty() ? null : valorNormalizado;
+    }
+
+    private String serializarDescricao(List<String> chipsDescricao) {
+        List<String> chipsNormalizados = normalizarChipsDescricao(chipsDescricao);
+        if (chipsNormalizados.isEmpty()) {
+            return null;
+        }
+
+        return String.join(CHIP_DELIMITER, chipsNormalizados);
+    }
+
+    private List<String> deserializarDescricao(String descricao) {
+        if (descricao == null || descricao.isBlank()) {
+            return List.of();
+        }
+
+        String texto = descricao.trim();
+        return normalizarChipsDescricao(List.of(texto.split("\\Q" + CHIP_DELIMITER + "\\E")));
+    }
+
+    private List<String> normalizarChipsDescricao(List<String> chipsDescricao) {
+        if (chipsDescricao == null || chipsDescricao.isEmpty()) {
+            return List.of();
+        }
+
+        return chipsDescricao.stream()
+                .filter(chip -> chip != null && !chip.isBlank())
+                .map(String::trim)
+                .toList();
     }
 
     public List<PetDashboardDto> buscarTodos(String nome, String especie, String cor, String porte, String usuarioId) {
@@ -92,7 +123,7 @@ public class CadastroPetService {
                 pet.getPorte(),
                 pet.getDataDesaparecimento(),
                 pet.getLocalDesaparecimento(),
-                pet.getDescricao(),
+                deserializarDescricao(pet.getDescricao()),
                 pet.getFotoUrl(),
                 pet.getNomeTutor(),
                 pet.getTelefoneTutor(),
