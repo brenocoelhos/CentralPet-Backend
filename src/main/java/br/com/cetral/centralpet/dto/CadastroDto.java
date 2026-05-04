@@ -40,6 +40,15 @@ public class CadastroDto {
     @Pattern(regexp = "^\\d{10,15}$", message = "Telefone deve conter entre 10 e 15 dígitos")
     private String telefone;
 
-    @Size(max = 300, message = "Endereço deve ter no máximo 300 caracteres")
-    private String endereco;
+    @Size(max = 200, message = "Rua deve ter no máximo 200 caracteres")
+    private String rua;
+
+    @Size(max = 20, message = "Número deve ter no máximo 20 caracteres")
+    private String numero;
+
+    @Size(max = 100, message = "Cidade deve ter no máximo 100 caracteres")
+    private String cidade;
+
+    @Size(max = 2, message = "Estado deve ter no máximo 2 caracteres")
+    private String estado;
 }

@@ -183,7 +183,10 @@ class CentralpetApplicationTests {
 		usuario.setCpf(cpf);
 		usuario.setDataNascimento(LocalDate.of(1995, 5, 10));
 		usuario.setTelefone(telefone);
-		usuario.setEndereco("Rua Teste, 123");
+		usuario.setRua("Rua Teste, 123");
+		usuario.setNumero("123");
+		usuario.setCidade("Sao Paulo");
+		usuario.setEstado("SP");
 		return usuarioRepository.save(usuario);
 	}
 

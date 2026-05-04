@@ -37,8 +37,17 @@ public class Usuario {
     @Column(nullable = false, unique = true, length = 15)
     private String telefone;
 
-    @Column(length = 300)
-    private String endereco;
+    @Column(length = 200)
+    private String rua;
+
+    @Column(length = 20)
+    private String numero;
+
+    @Column(length = 100)
+    private String cidade;
+
+    @Column(length = 2)
+    private String estado;
 
     @Column(name = "criado_em", nullable = false, updatable = false)
     private Timestamp criadoEm;

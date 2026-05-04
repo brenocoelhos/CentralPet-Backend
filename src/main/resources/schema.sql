@@ -6,6 +6,9 @@ CREATE TABLE IF NOT EXISTS usuarios (
     email           VARCHAR(255) NOT NULL UNIQUE,
     senha           VARCHAR(255) NOT NULL,
     telefone        VARCHAR(15) NOT NULL UNIQUE,
-    endereco        VARCHAR(300),
+    rua             VARCHAR(200),
+    numero          VARCHAR(20),
+    cidade          VARCHAR(100),
+    estado          VARCHAR(2),
     criado_em       TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP
 );
