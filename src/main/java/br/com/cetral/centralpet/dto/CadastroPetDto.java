@@ -2,6 +2,8 @@ package br.com.cetral.centralpet.dto;
 
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.DecimalMax;
+import jakarta.validation.constraints.DecimalMin;
 import jakarta.validation.constraints.Pattern;
 import jakarta.validation.constraints.Size;
 import lombok.Getter;
@@ -41,6 +43,14 @@ public class CadastroPetDto {
     @NotBlank(message = "Local do desaparecimento é obrigatório")
     @Size(max = 300, message = "Local do desaparecimento deve ter no máximo 300 caracteres")
     private String localDesaparecimento;
+
+    @DecimalMin(value = "-90.0", message = "Latitude do desaparecimento deve ser maior ou igual a -90")
+    @DecimalMax(value = "90.0", message = "Latitude do desaparecimento deve ser menor ou igual a 90")
+    private Double latitudeDesaparecimento;
+
+    @DecimalMin(value = "-180.0", message = "Longitude do desaparecimento deve ser maior ou igual a -180")
+    @DecimalMax(value = "180.0", message = "Longitude do desaparecimento deve ser menor ou igual a 180")
+    private Double longitudeDesaparecimento;
 
     @Size(max = 20, message = "Descrição pode conter no máximo 20 chips")
     private List<@NotBlank(message = "Cada chip da descrição deve ser preenchido")

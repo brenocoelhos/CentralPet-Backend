@@ -19,10 +19,14 @@ public class CadastroPetService {
 
     private final PetRepository petRepository;
     private final UsuarioRepository usuarioRepository;
+    private final PushNotificationService pushNotificationService;
 
-    public CadastroPetService(PetRepository petRepository, UsuarioRepository usuarioRepository) {
+    public CadastroPetService(PetRepository petRepository,
+                              UsuarioRepository usuarioRepository,
+                              PushNotificationService pushNotificationService) {
         this.petRepository = petRepository;
         this.usuarioRepository = usuarioRepository;
+        this.pushNotificationService = pushNotificationService;
     }
 
     public Pet cadastrar(CadastroPetDto dto) {
@@ -57,7 +61,15 @@ public class CadastroPetService {
         pet.setNomeTutor(dto.getNomeTutor().trim());
         pet.setTelefoneTutor(dto.getTelefoneTutor().trim());
 
-        return petRepository.save(pet);
+        Pet petSalvo = petRepository.save(pet);
+
+        pushNotificationService.notificarPetPerdido(
+                petSalvo,
+                dto.getLatitudeDesaparecimento(),
+                dto.getLongitudeDesaparecimento()
+        );
+
+        return petSalvo;
     }
 
     private String normalizarOpcional(String valor) {

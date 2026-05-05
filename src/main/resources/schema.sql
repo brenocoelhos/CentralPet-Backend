@@ -45,6 +45,18 @@ CREATE TABLE IF NOT EXISTS pet_tags (
         ON DELETE CASCADE
 );
 
+CREATE TABLE IF NOT EXISTS notificacoes_token (
+    id            BIGSERIAL PRIMARY KEY,
+    token         VARCHAR(255) NOT NULL UNIQUE,
+    user_id       VARCHAR(128) NOT NULL,
+    lat           DOUBLE PRECISION NOT NULL,
+    lng           DOUBLE PRECISION NOT NULL,
+    atualizado_em TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    CONSTRAINT fk_notificacoes_token_usuario
+        FOREIGN KEY (user_id) REFERENCES usuarios (id)
+        ON DELETE CASCADE
+);
+
 CREATE INDEX IF NOT EXISTS idx_pets_usuario_id
     ON pets (usuario_id);
 
@@ -53,3 +65,7 @@ CREATE INDEX IF NOT EXISTS idx_pets_busca_principal
 
 CREATE INDEX IF NOT EXISTS idx_pet_tags_pet_id
     ON pet_tags (pet_id);
+
+CREATE INDEX IF NOT EXISTS idx_notificacoes_token_user_id
+    ON notificacoes_token (user_id);
+

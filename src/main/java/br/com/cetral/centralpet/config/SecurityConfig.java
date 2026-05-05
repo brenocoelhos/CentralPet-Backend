@@ -43,6 +43,7 @@ public class SecurityConfig {
                                 "/auth/login",
                                 "/auth/cadastro",
                                 "/auth/logout",
+                                "/notificacoes/token",
                                 "/h2-console/**",
                                 "/swagger-ui.html",
                                 "/swagger-ui/**",
