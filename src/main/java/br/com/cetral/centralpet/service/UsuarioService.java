@@ -38,7 +38,10 @@ public class UsuarioService {
         usuario.setEmail(dto.getEmail());
         usuario.setSenha(passwordEncoder.encode(dto.getSenha()));
         usuario.setTelefone(dto.getTelefone());
-        usuario.setEndereco(dto.getEndereco());
+        usuario.setRua(dto.getRua());
+        usuario.setNumero(dto.getNumero());
+        usuario.setCidade(dto.getCidade());
+        usuario.setEstado(dto.getEstado());
 
         return usuarioRepository.save(usuario);
     }

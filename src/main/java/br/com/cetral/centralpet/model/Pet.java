@@ -47,6 +47,15 @@ public class Pet {
     @Column(columnDefinition = "TEXT")
     private String descricao;
 
+    @Column
+    private Boolean castrado;
+
+    @Column
+    private Boolean vacinado;
+
+    @Column
+    private Boolean recompensa;
+
     @Column(name = "foto_url", length = 500)
     private String fotoUrl;
 

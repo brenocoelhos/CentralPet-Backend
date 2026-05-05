@@ -7,6 +7,7 @@ import br.com.cetral.centralpet.service.CadastroPetService;
 import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -38,6 +39,12 @@ public class PetController {
     ) {
         List<PetDashboardDto> pets = cadastroPetService.buscarTodos(nome, especie, cor, porte, usuarioId);
         return ResponseEntity.ok(pets);
+    }
+
+    @DeleteMapping("/cadastro-pet/{petId}")
+    public ResponseEntity<String> deletarCadastroPet(@PathVariable Long petId, Authentication authentication) {
+        cadastroPetService.deletarCadastro(petId, authentication.getName());
+        return ResponseEntity.ok("Cadastro do pet removido com sucesso");
     }
 }
 

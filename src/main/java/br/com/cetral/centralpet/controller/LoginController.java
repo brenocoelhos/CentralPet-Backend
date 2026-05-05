@@ -2,12 +2,16 @@ package br.com.cetral.centralpet.controller;
 
 import br.com.cetral.centralpet.dto.CadastroDto;
 import br.com.cetral.centralpet.dto.LoginDto;
+import br.com.cetral.centralpet.dto.LoginResponseDto;
+import br.com.cetral.centralpet.dto.UsuarioLogadoDto;
 import br.com.cetral.centralpet.model.Usuario;
 import br.com.cetral.centralpet.service.LoginService;
 import br.com.cetral.centralpet.service.UsuarioService;
+import br.com.cetral.centralpet.service.JwtService;
 import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
@@ -16,16 +20,24 @@ public class LoginController {
 
     private final LoginService loginService;
     private final UsuarioService usuarioService;
+    private final JwtService jwtService;
 
-    public LoginController(LoginService loginService, UsuarioService usuarioService) {
+    public LoginController(LoginService loginService, UsuarioService usuarioService, JwtService jwtService) {
         this.loginService = loginService;
         this.usuarioService = usuarioService;
+        this.jwtService = jwtService;
     }
 
     @PostMapping("/login")
-    public ResponseEntity<String> login(@Valid @RequestBody LoginDto loginDto) {
-        String resultado = loginService.login(loginDto.getEmail(), loginDto.getSenha());
+    public ResponseEntity<LoginResponseDto> login(@Valid @RequestBody LoginDto loginDto) {
+        LoginResponseDto resultado = loginService.login(loginDto.getEmail(), loginDto.getSenha());
         return ResponseEntity.ok(resultado);
+    }
+
+    @GetMapping("/me")
+    public ResponseEntity<UsuarioLogadoDto> me(Authentication authentication) {
+        UsuarioLogadoDto usuario = loginService.buscarUsuarioLogado(authentication.getName());
+        return ResponseEntity.ok(usuario);
     }
 
     @PostMapping("/cadastro")
@@ -33,5 +45,16 @@ public class LoginController {
         Usuario usuario = usuarioService.cadastrar(cadastroDto);
         return ResponseEntity.status(HttpStatus.CREATED)
                 .body("Usuário cadastrado com sucesso: " + usuario.getNome());
+    }
+
+    @PostMapping("/logout")
+    public ResponseEntity<String> logout(@RequestHeader(value = "Authorization", required = false) String authHeader) {
+        if (authHeader == null || !authHeader.startsWith("Bearer ")) {
+            return ResponseEntity.badRequest().body("Token não fornecido");
+        }
+        
+        String token = authHeader.substring(7);
+        jwtService.invalidarToken(token);
+        return ResponseEntity.ok("Logout realizado com sucesso");
     }
 }

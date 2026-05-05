@@ -46,6 +46,12 @@ public class CadastroPetDto {
     private List<@NotBlank(message = "Cada chip da descrição deve ser preenchido")
             @Size(max = 80, message = "Cada chip da descrição deve ter no máximo 80 caracteres") String> descricao;
 
+    private Boolean castrado;
+
+    private Boolean vacinado;
+
+    private Boolean recompensa;
+
     @Size(max = 500, message = "URL da foto deve ter no máximo 500 caracteres")
     private String fotoUrl;
 

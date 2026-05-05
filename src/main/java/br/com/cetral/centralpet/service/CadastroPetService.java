@@ -9,6 +9,7 @@ import br.com.cetral.centralpet.repository.UsuarioRepository;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.NoSuchElementException;
 
 @Service
 public class CadastroPetService {
@@ -49,6 +50,9 @@ public class CadastroPetService {
         pet.setDataDesaparecimento(dto.getDataDesaparecimento());
         pet.setLocalDesaparecimento(dto.getLocalDesaparecimento().trim());
         pet.setDescricao(serializarDescricao(dto.getDescricao()));
+        pet.setCastrado(dto.getCastrado());
+        pet.setVacinado(dto.getVacinado());
+        pet.setRecompensa(dto.getRecompensa());
         pet.setFotoUrl(normalizarOpcional(dto.getFotoUrl()));
         pet.setNomeTutor(dto.getNomeTutor().trim());
         pet.setTelefoneTutor(dto.getTelefoneTutor().trim());
@@ -108,6 +112,17 @@ public class CadastroPetService {
                 .toList();
     }
 
+    public void deletarCadastro(Long petId, String emailUsuarioLogado) {
+        if (!petRepository.existsById(petId)) {
+            throw new NoSuchElementException("Pet não encontrado");
+        }
+
+        Pet pet = petRepository.findByIdAndUsuarioEmail(petId, emailUsuarioLogado)
+                .orElseThrow(() -> new SecurityException("Você não tem permissão para excluir este cadastro"));
+
+        petRepository.delete(pet);
+    }
+
     private boolean contemIgnorandoCase(String valor, String filtro) {
         if (filtro == null || filtro.isBlank()) {
             return true;
@@ -126,6 +141,9 @@ public class CadastroPetService {
                 pet.getDataDesaparecimento(),
                 pet.getLocalDesaparecimento(),
                 deserializarDescricao(pet.getDescricao()),
+                pet.getCastrado(),
+                pet.getVacinado(),
+                pet.getRecompensa(),
                 pet.getFotoUrl(),
                 pet.getNomeTutor(),
                 pet.getTelefoneTutor(),
