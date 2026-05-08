@@ -68,6 +68,24 @@ CREATE TABLE IF NOT EXISTS notificacoes_token (
         ON DELETE CASCADE
 );
 
+-- Corrige ambientes legados onde colunas de texto foram criadas como bytea.
+-- Evita uso de bloco DO $$ porque o DataSource initializer divide statements por ';'.
+ALTER TABLE pets
+    ALTER COLUMN nome TYPE VARCHAR(100)
+    USING convert_from(nome::bytea, 'UTF8');
+
+ALTER TABLE pets
+    ALTER COLUMN especie TYPE VARCHAR(50)
+    USING convert_from(especie::bytea, 'UTF8');
+
+ALTER TABLE pets
+    ALTER COLUMN cor TYPE VARCHAR(80)
+    USING convert_from(cor::bytea, 'UTF8');
+
+ALTER TABLE pets
+    ALTER COLUMN porte TYPE VARCHAR(20)
+    USING convert_from(porte::bytea, 'UTF8');
+
 CREATE INDEX IF NOT EXISTS idx_pets_usuario_id
     ON pets (usuario_id);
 

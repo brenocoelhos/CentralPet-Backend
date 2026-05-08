@@ -27,11 +27,11 @@ public interface PetRepository extends JpaRepository<Pet, Long> {
      * Resolve o problema de: filtros em memória + sem paginação.
      */
     @Query("SELECT p FROM Pet p WHERE " +
-           "(:nome IS NULL OR LOWER(p.nome) LIKE LOWER(CONCAT('%', :nome, '%'))) AND " +
-           "(:especie IS NULL OR LOWER(p.especie) LIKE LOWER(CONCAT('%', :especie, '%'))) AND " +
-           "(:cor IS NULL OR LOWER(p.cor) LIKE LOWER(CONCAT('%', :cor, '%'))) AND " +
-           "(:porte IS NULL OR LOWER(p.porte) LIKE LOWER(CONCAT('%', :porte, '%'))) AND " +
-           "(:usuarioId IS NULL OR p.usuario.id = :usuarioId)")
+            "(:nome IS NULL OR LOWER(p.nome) LIKE LOWER(CONCAT('%', CAST(:nome AS string), '%'))) AND " +
+            "(:especie IS NULL OR LOWER(p.especie) LIKE LOWER(CONCAT('%', CAST(:especie AS string), '%'))) AND " +
+            "(:cor IS NULL OR LOWER(p.cor) LIKE LOWER(CONCAT('%', CAST(:cor AS string), '%'))) AND " +
+            "(:porte IS NULL OR LOWER(p.porte) LIKE LOWER(CONCAT('%', CAST(:porte AS string), '%'))) AND " +
+            "(:usuarioId IS NULL OR p.usuario.id = :usuarioId)")
     Page<Pet> buscarComFiltros(@Param("nome") String nome,
                                @Param("especie") String especie,
                                @Param("cor") String cor,
