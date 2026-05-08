@@ -5,6 +5,7 @@ import br.com.cetral.centralpet.model.Usuario;
 import br.com.cetral.centralpet.repository.UsuarioRepository;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.UUID;
 
@@ -19,6 +20,7 @@ public class UsuarioService {
         this.passwordEncoder = passwordEncoder;
     }
 
+    @Transactional
     public Usuario cadastrar(CadastroDto dto) {
         if (usuarioRepository.existsByEmail(dto.getEmail())) {
             throw new IllegalArgumentException("Email já está cadastrado");

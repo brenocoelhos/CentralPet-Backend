@@ -6,6 +6,7 @@ import br.com.cetral.centralpet.model.Usuario;
 import br.com.cetral.centralpet.repository.UsuarioRepository;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 @Service
 public class LoginService {
@@ -20,6 +21,7 @@ public class LoginService {
         this.jwtService = jwtService;
     }
 
+    @Transactional(readOnly = true)
     public LoginResponseDto login(String email, String senha) {
         Usuario usuario = usuarioRepository.findByEmail(email)
                 .orElseThrow(() -> new IllegalArgumentException("Usuário não encontrado"));
@@ -38,6 +40,7 @@ public class LoginService {
         );
     }
 
+    @Transactional(readOnly = true)
     public UsuarioLogadoDto buscarUsuarioLogado(String email) {
         Usuario usuario = usuarioRepository.findByEmail(email)
                 .orElseThrow(() -> new IllegalArgumentException("Usuário não encontrado"));

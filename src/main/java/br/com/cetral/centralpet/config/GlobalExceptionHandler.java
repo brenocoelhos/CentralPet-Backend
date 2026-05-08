@@ -1,6 +1,7 @@
 package br.com.cetral.centralpet.config;
 
 import jakarta.servlet.http.HttpServletRequest;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.http.converter.HttpMessageNotReadableException;
@@ -45,9 +46,20 @@ public class GlobalExceptionHandler {
         return ResponseEntity.badRequest().body(body);
     }
 
+    @ExceptionHandler(DataIntegrityViolationException.class)
+    public ResponseEntity<Map<String, Object>> handleDataIntegrity(DataIntegrityViolationException ex,
+                                                                    HttpServletRequest request) {
+        Map<String, Object> body = buildErrorBody(
+                HttpStatus.CONFLICT,
+                "Conflito de dados: verifique campos únicos obrigatórios",
+                request.getRequestURI()
+        );
+        return ResponseEntity.status(HttpStatus.CONFLICT).body(body);
+    }
+
     @ExceptionHandler(NoSuchElementException.class)
     public ResponseEntity<Map<String, Object>> handleNotFound(NoSuchElementException ex,
-                                                              HttpServletRequest request) {
+                                                               HttpServletRequest request) {
         Map<String, Object> body = buildErrorBody(
                 HttpStatus.NOT_FOUND,
                 ex.getMessage(),
@@ -58,7 +70,7 @@ public class GlobalExceptionHandler {
 
     @ExceptionHandler(SecurityException.class)
     public ResponseEntity<Map<String, Object>> handleForbidden(SecurityException ex,
-                                                               HttpServletRequest request) {
+                                                                HttpServletRequest request) {
         Map<String, Object> body = buildErrorBody(
                 HttpStatus.FORBIDDEN,
                 ex.getMessage(),
@@ -92,7 +104,7 @@ public class GlobalExceptionHandler {
 
     @ExceptionHandler(Exception.class)
     public ResponseEntity<Map<String, Object>> handleGeneric(Exception ex,
-                                                             HttpServletRequest request) {
+                                                              HttpServletRequest request) {
         Map<String, Object> body = buildErrorBody(
                 HttpStatus.INTERNAL_SERVER_ERROR,
                 "Erro interno no servidor",

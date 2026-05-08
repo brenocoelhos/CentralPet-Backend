@@ -5,6 +5,7 @@ import br.com.cetral.centralpet.model.NotificacaoToken;
 import br.com.cetral.centralpet.repository.NotificacaoTokenRepository;
 import br.com.cetral.centralpet.repository.UsuarioRepository;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 @Service
 public class NotificacaoTokenService {
@@ -18,6 +19,7 @@ public class NotificacaoTokenService {
         this.usuarioRepository = usuarioRepository;
     }
 
+    @Transactional
     public void salvarOuAtualizar(NotificacaoTokenDto dto) {
         String tokenNormalizado = dto.getToken().trim();
         String userIdNormalizado = dto.getUserId().trim();

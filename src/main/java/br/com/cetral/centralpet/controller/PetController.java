@@ -1,6 +1,7 @@
 package br.com.cetral.centralpet.controller;
 
 import br.com.cetral.centralpet.dto.CadastroPetDto;
+import br.com.cetral.centralpet.dto.PageResponseDto;
 import br.com.cetral.centralpet.dto.PetDashboardDto;
 import br.com.cetral.centralpet.model.Pet;
 import br.com.cetral.centralpet.service.CadastroPetService;
@@ -10,7 +11,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.List;
+import java.util.Map;
 
 @RestController
 @RequestMapping("/auth")
@@ -23,22 +24,33 @@ public class PetController {
     }
 
     @PostMapping("/cadastro-pet")
-    public ResponseEntity<String> cadastroPet(@Valid @RequestBody CadastroPetDto cadastroPetDto) {
+    public ResponseEntity<Map<String, Object>> cadastroPet(@Valid @RequestBody CadastroPetDto cadastroPetDto) {
         Pet pet = cadastroPetService.cadastrar(cadastroPetDto);
         return ResponseEntity.status(HttpStatus.CREATED)
-                .body("Pet cadastrado com sucesso: " + pet.getNome());
+                .body(Map.of(
+                        "id", pet.getId(),
+                        "nome", pet.getNome(),
+                        "message", "Pet cadastrado com sucesso"
+                ));
     }
 
+    /**
+     * Busca paginada de pets com filtros opcionais.
+     * Resposta: { content: [...], page, size, totalElements, totalPages, hasNext }
+     */
     @GetMapping("/busca-pets")
-    public ResponseEntity<List<PetDashboardDto>> buscaPets(
+    public ResponseEntity<PageResponseDto<PetDashboardDto>> buscaPets(
             @RequestParam(required = false) String nome,
             @RequestParam(required = false) String especie,
             @RequestParam(required = false) String cor,
             @RequestParam(required = false) String porte,
-            @RequestParam(required = false) String usuarioId
+            @RequestParam(required = false) String usuarioId,
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "20") int size
     ) {
-        List<PetDashboardDto> pets = cadastroPetService.buscarTodos(nome, especie, cor, porte, usuarioId);
-        return ResponseEntity.ok(pets);
+        PageResponseDto<PetDashboardDto> resultado =
+                cadastroPetService.buscarTodos(nome, especie, cor, porte, usuarioId, page, size);
+        return ResponseEntity.ok(resultado);
     }
 
     @DeleteMapping("/cadastro-pet/{petId}")

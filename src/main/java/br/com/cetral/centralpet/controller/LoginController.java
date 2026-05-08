@@ -1,10 +1,12 @@
 package br.com.cetral.centralpet.controller;
 
 import br.com.cetral.centralpet.dto.CadastroDto;
+import br.com.cetral.centralpet.dto.GoogleLoginDto;
 import br.com.cetral.centralpet.dto.LoginDto;
 import br.com.cetral.centralpet.dto.LoginResponseDto;
 import br.com.cetral.centralpet.dto.UsuarioLogadoDto;
 import br.com.cetral.centralpet.model.Usuario;
+import br.com.cetral.centralpet.service.GoogleAuthService;
 import br.com.cetral.centralpet.service.LoginService;
 import br.com.cetral.centralpet.service.UsuarioService;
 import br.com.cetral.centralpet.service.JwtService;
@@ -21,16 +23,24 @@ public class LoginController {
     private final LoginService loginService;
     private final UsuarioService usuarioService;
     private final JwtService jwtService;
+    private final GoogleAuthService googleAuthService;
 
-    public LoginController(LoginService loginService, UsuarioService usuarioService, JwtService jwtService) {
+    public LoginController(LoginService loginService, UsuarioService usuarioService, JwtService jwtService, GoogleAuthService googleAuthService) {
         this.loginService = loginService;
         this.usuarioService = usuarioService;
         this.jwtService = jwtService;
+        this.googleAuthService = googleAuthService;
     }
 
     @PostMapping("/login")
     public ResponseEntity<LoginResponseDto> login(@Valid @RequestBody LoginDto loginDto) {
         LoginResponseDto resultado = loginService.login(loginDto.getEmail(), loginDto.getSenha());
+        return ResponseEntity.ok(resultado);
+    }
+
+    @PostMapping("/google")
+    public ResponseEntity<LoginResponseDto> loginGoogle(@Valid @RequestBody GoogleLoginDto googleLoginDto) {
+        LoginResponseDto resultado = googleAuthService.loginComGoogle(googleLoginDto.getIdToken());
         return ResponseEntity.ok(resultado);
     }
 

@@ -28,13 +28,13 @@ public class Usuario {
     @Column(nullable = false, unique = true, length = 255)
     private String email;
 
-    @Column(nullable = false, unique = true, length = 11)
+    @Column(unique = true, length = 11)
     private String cpf;
 
-    @Column(name = "data_nascimento", nullable = false)
+    @Column(name = "data_nascimento")
     private LocalDate dataNascimento;
 
-    @Column(nullable = false, unique = true, length = 15)
+    @Column(unique = true, length = 15)
     private String telefone;
 
     @Column(length = 200)

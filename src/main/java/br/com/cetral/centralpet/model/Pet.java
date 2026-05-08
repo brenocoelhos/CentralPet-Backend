@@ -6,8 +6,6 @@ import lombok.Setter;
 
 import java.sql.Timestamp;
 import java.time.LocalDate;
-import java.util.ArrayList;
-import java.util.List;
 
 @Entity
 @Table(name = "pets")
@@ -68,8 +66,6 @@ public class Pet {
     @Column(name = "criado_em", nullable = false, updatable = false)
     private Timestamp criadoEm;
 
-    @OneToMany(mappedBy = "pet", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<PetTag> tags = new ArrayList<>();
 
     @PrePersist
     void prePersist() {

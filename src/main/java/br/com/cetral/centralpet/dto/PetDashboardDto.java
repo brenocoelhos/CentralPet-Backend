@@ -17,6 +17,7 @@ public record PetDashboardDto(
         Boolean vacinado,
         Boolean recompensa,
         String fotoUrl,
+        List<String> imagens,
         String nomeTutor,
         String telefoneTutor,
         String usuarioId

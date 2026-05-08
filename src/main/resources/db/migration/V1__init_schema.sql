@@ -1,3 +1,6 @@
+-- V1 — Schema inicial do CentralPet
+-- Flyway baseline-on-migrate=true permite rodar em banco já existente
+
 CREATE TABLE IF NOT EXISTS usuarios (
     id              VARCHAR(128) PRIMARY KEY,
     nome            VARCHAR(150) NOT NULL,
@@ -68,11 +71,25 @@ CREATE TABLE IF NOT EXISTS notificacoes_token (
         ON DELETE CASCADE
 );
 
+-- Índices
 CREATE INDEX IF NOT EXISTS idx_pets_usuario_id
     ON pets (usuario_id);
 
 CREATE INDEX IF NOT EXISTS idx_pets_busca_principal
     ON pets (usuario_id, data_desaparecimento, nome, especie);
+
+-- Índices para os novos filtros por coluna individual
+CREATE INDEX IF NOT EXISTS idx_pets_nome_lower
+    ON pets (LOWER(nome));
+
+CREATE INDEX IF NOT EXISTS idx_pets_especie_lower
+    ON pets (LOWER(especie));
+
+CREATE INDEX IF NOT EXISTS idx_pets_cor_lower
+    ON pets (LOWER(cor));
+
+CREATE INDEX IF NOT EXISTS idx_pets_porte_lower
+    ON pets (LOWER(porte));
 
 CREATE INDEX IF NOT EXISTS idx_pet_tags_pet_id
     ON pet_tags (pet_id);

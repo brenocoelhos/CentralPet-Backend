@@ -43,6 +43,7 @@ public class SecurityConfig {
                                 "/auth/login",
                                 "/auth/cadastro",
                                 "/auth/logout",
+                                "/auth/google",
                                 "/notificacoes/token",
                                 "/h2-console/**",
                                 "/swagger-ui.html",
@@ -53,6 +54,10 @@ public class SecurityConfig {
                                 "/api-docs/**"
                         ).permitAll()
                         .requestMatchers(HttpMethod.GET, "/auth/busca-pets").permitAll()
+                        // Apenas GET e' publico - upload e delete exigem JWT
+                        .requestMatchers(HttpMethod.GET, "/auth/pets/*/imagens").permitAll()
+                        .requestMatchers(HttpMethod.GET, "/uploads/**").permitAll()
+                        .requestMatchers(HttpMethod.GET, "/actuator/health", "/actuator/info").permitAll()
                         .anyRequest().authenticated()
                 )
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
