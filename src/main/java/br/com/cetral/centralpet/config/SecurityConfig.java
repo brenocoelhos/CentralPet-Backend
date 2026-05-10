@@ -3,8 +3,8 @@ package br.com.cetral.centralpet.config;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpMethod;
-import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.Customizer;
+import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -44,6 +44,8 @@ public class SecurityConfig {
                                 "/auth/cadastro",
                                 "/auth/logout",
                                 "/auth/google",
+                                "/auth/esqueci-senha",
+                                "/auth/redefinir-senha",
                                 "/notificacoes/token",
                                 "/h2-console/**",
                                 "/swagger-ui.html",
@@ -54,7 +56,6 @@ public class SecurityConfig {
                                 "/api-docs/**"
                         ).permitAll()
                         .requestMatchers(HttpMethod.GET, "/auth/busca-pets").permitAll()
-                        // Apenas GET e' publico - upload e delete exigem JWT
                         .requestMatchers(HttpMethod.GET, "/auth/pets/*/imagens").permitAll()
                         .requestMatchers(HttpMethod.GET, "/uploads/**").permitAll()
                         .requestMatchers(HttpMethod.GET, "/actuator/health", "/actuator/info").permitAll()

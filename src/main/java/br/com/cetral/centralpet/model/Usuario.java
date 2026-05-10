@@ -52,6 +52,12 @@ public class Usuario {
     @Column(name = "criado_em", nullable = false, updatable = false)
     private Timestamp criadoEm;
 
+    @Column(name = "token_recuperacao", length = 255)
+    private String tokenRecuperacao;
+
+    @Column(name = "token_expiracao")
+    private Timestamp tokenExpiracao;
+
     @OneToMany(mappedBy = "usuario", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Pet> pets = new ArrayList<>();
 

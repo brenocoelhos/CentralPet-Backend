@@ -1,15 +1,17 @@
 package br.com.cetral.centralpet.controller;
 
 import br.com.cetral.centralpet.dto.CadastroDto;
+import br.com.cetral.centralpet.dto.EsqueciSenhaDto;
 import br.com.cetral.centralpet.dto.GoogleLoginDto;
 import br.com.cetral.centralpet.dto.LoginDto;
 import br.com.cetral.centralpet.dto.LoginResponseDto;
+import br.com.cetral.centralpet.dto.RedefinirSenhaDto;
 import br.com.cetral.centralpet.dto.UsuarioLogadoDto;
 import br.com.cetral.centralpet.model.Usuario;
 import br.com.cetral.centralpet.service.GoogleAuthService;
+import br.com.cetral.centralpet.service.JwtService;
 import br.com.cetral.centralpet.service.LoginService;
 import br.com.cetral.centralpet.service.UsuarioService;
-import br.com.cetral.centralpet.service.JwtService;
 import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -57,12 +59,24 @@ public class LoginController {
                 .body("Usuário cadastrado com sucesso: " + usuario.getNome());
     }
 
+    @PostMapping("/esqueci-senha")
+    public ResponseEntity<String> esqueciSenha(@Valid @RequestBody EsqueciSenhaDto dto) {
+        loginService.solicitarRecuperacaoSenha(dto.getEmail());
+        return ResponseEntity.ok("Se o email estiver cadastrado, enviaremos um link de recuperação.");
+    }
+
+    @PostMapping("/redefinir-senha")
+    public ResponseEntity<String> redefinirSenha(@Valid @RequestBody RedefinirSenhaDto dto) {
+        loginService.redefinirSenha(dto.getToken(), dto.getNovaSenha());
+        return ResponseEntity.ok("Senha redefinida com sucesso.");
+    }
+
     @PostMapping("/logout")
     public ResponseEntity<String> logout(@RequestHeader(value = "Authorization", required = false) String authHeader) {
         if (authHeader == null || !authHeader.startsWith("Bearer ")) {
             return ResponseEntity.badRequest().body("Token não fornecido");
         }
-        
+
         String token = authHeader.substring(7);
         jwtService.invalidarToken(token);
         return ResponseEntity.ok("Logout realizado com sucesso");
