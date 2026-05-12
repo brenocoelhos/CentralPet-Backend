@@ -1,3 +1,4 @@
+-- ─── Usuarios ────────────────────────────────────────────────────────────────
 CREATE TABLE IF NOT EXISTS usuarios (
     id              VARCHAR(128) PRIMARY KEY,
     nome            VARCHAR(150) NOT NULL,
@@ -13,11 +14,12 @@ CREATE TABLE IF NOT EXISTS usuarios (
     criado_em       TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP
 );
 
+-- ─── Pets ─────────────────────────────────────────────────────────────────────
 CREATE TABLE IF NOT EXISTS pets (
     id                    BIGSERIAL PRIMARY KEY,
     usuario_id            VARCHAR(128) NOT NULL,
     nome                  VARCHAR(100) NOT NULL,
-    especie               VARCHAR(50) NOT NULL,
+    especie               VARCHAR(50)  NOT NULL,
     raca                  VARCHAR(100),
     cor                   VARCHAR(80),
     porte                 VARCHAR(20),
@@ -29,33 +31,36 @@ CREATE TABLE IF NOT EXISTS pets (
     recompensa            BOOLEAN,
     foto_url              VARCHAR(500),
     nome_tutor            VARCHAR(150) NOT NULL,
-    telefone_tutor        VARCHAR(15) NOT NULL,
+    telefone_tutor        VARCHAR(15)  NOT NULL,
     criado_em             TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
     CONSTRAINT fk_pets_usuario
         FOREIGN KEY (usuario_id) REFERENCES usuarios (id)
         ON DELETE CASCADE
 );
 
+-- ─── Pet Tags ─────────────────────────────────────────────────────────────────
 CREATE TABLE IF NOT EXISTS pet_tags (
-    id      BIGSERIAL PRIMARY KEY,
-    pet_id  BIGINT NOT NULL,
-    tag     VARCHAR(80) NOT NULL,
+    id     BIGSERIAL PRIMARY KEY,
+    pet_id BIGINT      NOT NULL,
+    tag    VARCHAR(80) NOT NULL,
     CONSTRAINT fk_pet_tags_pet
         FOREIGN KEY (pet_id) REFERENCES pets (id)
         ON DELETE CASCADE
 );
 
+-- ─── Pet Imagens ──────────────────────────────────────────────────────────────
 CREATE TABLE IF NOT EXISTS pet_imagens (
     id        BIGSERIAL PRIMARY KEY,
-    pet_id    BIGINT NOT NULL,
+    pet_id    BIGINT        NOT NULL,
     url       VARCHAR(1000) NOT NULL,
-    s3_key    VARCHAR(500) NOT NULL,
+    s3_key    VARCHAR(500)  NOT NULL,
     criado_em TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
     CONSTRAINT fk_pet_imagens_pet
         FOREIGN KEY (pet_id) REFERENCES pets (id)
         ON DELETE CASCADE
 );
 
+-- ─── Notificacoes Token ───────────────────────────────────────────────────────
 CREATE TABLE IF NOT EXISTS notificacoes_token (
     id            BIGSERIAL PRIMARY KEY,
     token         VARCHAR(255) NOT NULL UNIQUE,
@@ -68,24 +73,7 @@ CREATE TABLE IF NOT EXISTS notificacoes_token (
         ON DELETE CASCADE
 );
 
--- Corrige ambientes legados onde colunas de texto foram criadas como bytea.
--- Evita uso de bloco DO $$ porque o DataSource initializer divide statements por ';'.
-ALTER TABLE pets
-    ALTER COLUMN nome TYPE VARCHAR(100)
-    USING convert_from(nome::bytea, 'UTF8');
-
-ALTER TABLE pets
-    ALTER COLUMN especie TYPE VARCHAR(50)
-    USING convert_from(especie::bytea, 'UTF8');
-
-ALTER TABLE pets
-    ALTER COLUMN cor TYPE VARCHAR(80)
-    USING convert_from(cor::bytea, 'UTF8');
-
-ALTER TABLE pets
-    ALTER COLUMN porte TYPE VARCHAR(20)
-    USING convert_from(porte::bytea, 'UTF8');
-
+-- ─── Indices ──────────────────────────────────────────────────────────────────
 CREATE INDEX IF NOT EXISTS idx_pets_usuario_id
     ON pets (usuario_id);
 
@@ -97,4 +85,3 @@ CREATE INDEX IF NOT EXISTS idx_pet_tags_pet_id
 
 CREATE INDEX IF NOT EXISTS idx_notificacoes_token_user_id
     ON notificacoes_token (user_id);
-
