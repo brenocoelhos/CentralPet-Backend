@@ -23,11 +23,11 @@ public class EmailService {
     @Value("${brevo.sender.name}")
     private String senderName;
 
-    public EmailService(RestClient.Builder restClientBuilder) {
-        this.restClient = restClientBuilder
-                .baseUrl("https://api.brevo.com/v3")
-                .build();
-    }
+   public EmailService() {
+    this.restClient = RestClient.builder()
+            .baseUrl("https://api.brevo.com/v3")
+            .build();
+}
 
     public void enviarEmailRecuperacaoSenha(String destino, String nome, String link) {
         String texto =
