@@ -23,21 +23,27 @@ public class EmailService {
     @Value("${brevo.sender.name}")
     private String senderName;
 
-   public EmailService() {
-    this.restClient = RestClient.builder()
-            .baseUrl("https://api.brevo.com/v3")
-            .build();
-}
+    public EmailService() {
+        this.restClient = RestClient.builder()
+                .baseUrl("https://api.brevo.com/v3")
+                .build();
+    }
 
     public void enviarEmailRecuperacaoSenha(String destino, String nome, String link) {
-        String texto =
-                "Olá, " + nome + "!\n\n" +
-                "Recebemos uma solicitação para redefinir sua senha no CentralPet.\n\n" +
-                "Clique no link abaixo para criar uma nova senha:\n" +
-                link + "\n\n" +
-                "Esse link é válido por 30 minutos.\n\n" +
-                "Se você não solicitou essa recuperação, ignore este email.\n\n" +
-                "CentralPet";
+        String html =
+                "<p>Olá, " + nome + "!</p>" +
+                "<p>Recebemos uma solicitação para redefinir sua senha no CentralPet.</p>" +
+                "<p>Clique no botão abaixo para criar uma nova senha:</p>" +
+                "<p>" +
+                "<a href=\"" + link + "\" " +
+                "style=\"display:inline-block;background:#D97757;color:#ffffff;padding:12px 20px;" +
+                "border-radius:999px;text-decoration:none;font-weight:bold;\">" +
+                "Redefinir senha" +
+                "</a>" +
+                "</p>" +
+                "<p>Esse link é válido por 30 minutos.</p>" +
+                "<p>Se você não solicitou essa recuperação, ignore este email.</p>" +
+                "<p>CentralPet</p>";
 
         Map<String, Object> body = Map.of(
                 "sender", Map.of(
@@ -51,7 +57,7 @@ public class EmailService {
                         )
                 ),
                 "subject", "Recuperação de senha - CentralPet",
-                "textContent", texto
+                "htmlContent", html
         );
 
         restClient.post()
