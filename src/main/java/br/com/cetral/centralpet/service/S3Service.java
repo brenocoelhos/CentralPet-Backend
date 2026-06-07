@@ -9,10 +9,20 @@ import software.amazon.awssdk.services.s3.model.DeleteObjectRequest;
 import software.amazon.awssdk.services.s3.model.PutObjectRequest;
 
 import java.io.IOException;
+import java.util.Set;
 import java.util.UUID;
 
 @Service
 public class S3Service {
+
+    private static final long TAMANHO_MAXIMO_IMAGEM = 5 * 1024 * 1024;
+
+    private static final Set<String> CONTENT_TYPES_PERMITIDOS = Set.of(
+            "image/jpeg",
+            "image/jpg",
+            "image/png",
+            "image/webp"
+    );
 
     private final S3Client s3Client;
 
@@ -27,11 +37,17 @@ public class S3Service {
     }
 
     public String uploadImagem(MultipartFile file) throws IOException {
+        validarArquivo(file);
+
         String key = "uploads/" + gerarNomeSeguro(file);
         return upload(key, file);
     }
 
     public UploadResult uploadImagemPet(Long petId, MultipartFile file) throws IOException {
+        if (petId == null || petId <= 0) {
+            throw new IllegalArgumentException("Pet inválido");
+        }
+
         validarArquivo(file);
 
         String key = "pets/" + petId + "/" + gerarNomeSeguro(file);
@@ -58,14 +74,15 @@ public class S3Service {
                 .bucket(bucketName)
                 .key(key)
                 .contentType(contentType)
+                .contentLength(file.getSize())
                 .build();
 
         s3Client.putObject(
                 request,
-                RequestBody.fromBytes(file.getBytes())
+                RequestBody.fromInputStream(file.getInputStream(), file.getSize())
         );
 
-        return "https://" + bucketName + ".s3." + region + ".amazonaws.com/" + key;
+        return gerarUrlPublica(key);
     }
 
     private void validarArquivo(MultipartFile file) {
@@ -76,6 +93,16 @@ public class S3Service {
         if (file.isEmpty() || file.getSize() <= 0) {
             throw new IllegalArgumentException("Arquivo vazio");
         }
+
+        if (file.getSize() > TAMANHO_MAXIMO_IMAGEM) {
+            throw new IllegalArgumentException("Imagem muito grande. O tamanho máximo permitido é 5MB");
+        }
+
+        String contentType = obterContentType(file);
+
+        if (!CONTENT_TYPES_PERMITIDOS.contains(contentType)) {
+            throw new IllegalArgumentException("Formato de imagem não permitido");
+        }
     }
 
     private String gerarNomeSeguro(MultipartFile file) {
@@ -85,13 +112,9 @@ public class S3Service {
             nomeOriginal = "foto.jpg";
         }
 
-        nomeOriginal = nomeOriginal
-                .replace("\\", "/");
-
+        nomeOriginal = nomeOriginal.replace("\\", "/");
         nomeOriginal = nomeOriginal.substring(nomeOriginal.lastIndexOf("/") + 1);
-
-        nomeOriginal = nomeOriginal
-                .replaceAll("[^a-zA-Z0-9._-]", "_");
+        nomeOriginal = nomeOriginal.replaceAll("[^a-zA-Z0-9._-]", "_");
 
         if (!nomeOriginal.contains(".")) {
             nomeOriginal = nomeOriginal + ".jpg";
@@ -107,8 +130,13 @@ public class S3Service {
             return "image/jpeg";
         }
 
-        return contentType;
+        return contentType.toLowerCase();
     }
 
-    public record UploadResult(String s3Key, String url) {}
+    private String gerarUrlPublica(String key) {
+        return "https://" + bucketName + ".s3." + region + ".amazonaws.com/" + key;
+    }
+
+    public record UploadResult(String s3Key, String url) {
+    }
 }
