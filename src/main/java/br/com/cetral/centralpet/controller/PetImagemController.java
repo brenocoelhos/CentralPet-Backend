@@ -7,7 +7,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
-import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -27,19 +26,7 @@ public class PetImagemController {
             @RequestParam("file") MultipartFile file) {
 
         try {
-
-            System.out.println("========== UPLOAD IMAGEM ==========");
-            System.out.println("PET ID: " + petId);
-            System.out.println("ORIGINAL FILENAME: " + file.getOriginalFilename());
-            System.out.println("CONTENT TYPE: " + file.getContentType());
-            System.out.println("SIZE: " + file.getSize());
-            System.out.println("EMPTY: " + file.isEmpty());
-
             PetImagem imagem = petImagemService.uploadImagem(petId, file);
-
-            System.out.println("UPLOAD OK");
-            System.out.println("IMAGEM ID: " + imagem.getId());
-            System.out.println("IMAGEM URL: " + imagem.getUrl());
 
             return ResponseEntity.status(HttpStatus.CREATED)
                     .body(Map.of(
@@ -47,47 +34,19 @@ public class PetImagemController {
                             "url", imagem.getUrl()
                     ));
 
+        } catch (IllegalArgumentException e) {
+            return ResponseEntity
+                    .badRequest()
+                    .body(Map.of(
+                            "erro", e.getMessage()
+                    ));
+
         } catch (Exception e) {
-
-            e.printStackTrace();
-
-            Map<String, Object> erro = new LinkedHashMap<>();
-
-            erro.put("erroClasse", e.getClass().getName());
-            erro.put("erroMensagem",
-                    e.getMessage() != null
-                            ? e.getMessage()
-                            : "Mensagem nula");
-
-            erro.put("causa",
-                    e.getCause() != null
-                            ? e.getCause().toString()
-                            : "Sem causa");
-
-            erro.put("petId", petId);
-
-            try {
-                erro.put("fileOriginalName",
-                        file != null ? file.getOriginalFilename() : null);
-
-                erro.put("fileContentType",
-                        file != null ? file.getContentType() : null);
-
-                erro.put("fileSize",
-                        file != null ? file.getSize() : null);
-
-                erro.put("fileIsEmpty",
-                        file != null && file.isEmpty());
-
-            } catch (Exception ignored) {
-            }
-
-            System.out.println("========== ERRO UPLOAD ==========");
-            System.out.println(erro);
-
             return ResponseEntity
                     .status(HttpStatus.INTERNAL_SERVER_ERROR)
-                    .body(erro);
+                    .body(Map.of(
+                            "erro", "Erro interno ao enviar imagem"
+                    ));
         }
     }
 
@@ -107,12 +66,14 @@ public class PetImagemController {
     }
 
     @DeleteMapping("/{imagemId}")
-    public ResponseEntity<String> deletarImagem(
+    public ResponseEntity<Map<String, String>> deletarImagem(
             @PathVariable Long petId,
             @PathVariable Long imagemId) {
 
         petImagemService.deletarImagem(petId, imagemId);
 
-        return ResponseEntity.ok("Imagem removida com sucesso");
+        return ResponseEntity.ok(Map.of(
+                "mensagem", "Imagem removida com sucesso"
+        ));
     }
 }
