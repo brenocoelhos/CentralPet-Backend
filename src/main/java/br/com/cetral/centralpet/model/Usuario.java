@@ -58,6 +58,10 @@ public class Usuario {
     @Column(name = "token_expiracao")
     private Timestamp tokenExpiracao;
 
+    // NOVA COLUNA ADICIONADA AQUI
+    @Column(name = "foto_perfil", length = 500)
+    private String fotoPerfil;
+
     @OneToMany(mappedBy = "usuario", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Pet> pets = new ArrayList<>();
 
