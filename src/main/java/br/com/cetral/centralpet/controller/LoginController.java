@@ -17,6 +17,9 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
+
+import java.util.Map;
 
 @RestController
 @RequestMapping("/auth")
@@ -50,6 +53,20 @@ public class LoginController {
     public ResponseEntity<UsuarioLogadoDto> me(Authentication authentication) {
         UsuarioLogadoDto usuario = loginService.buscarUsuarioLogado(authentication.getName());
         return ResponseEntity.ok(usuario);
+    }
+
+    // NOVO ENDPOINT DE UPLOAD DE FOTO DE PERFIL
+    @PostMapping(value = "/perfil/foto", consumes = "multipart/form-data")
+    public ResponseEntity<Map<String, String>> uploadFotoPerfil(
+            Authentication authentication,
+            @RequestParam("file") MultipartFile file) {
+        
+        String urlFoto = usuarioService.atualizarFotoPerfil(authentication.getName(), file);
+        
+        return ResponseEntity.ok(Map.of(
+                "fotoPerfil", urlFoto,
+                "message", "Foto de perfil atualizada com sucesso"
+        ));
     }
 
     @PostMapping("/cadastro")
