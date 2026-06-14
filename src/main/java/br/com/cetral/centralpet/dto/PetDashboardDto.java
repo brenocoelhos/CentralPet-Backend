@@ -11,6 +11,7 @@ public record PetDashboardDto(
         String cor,
         String porte,
         LocalDate dataDesaparecimento,
+        LocalDate dataCadastro,
         String localDesaparecimento,
         List<String> descricao,
         Boolean castrado,
@@ -23,4 +24,3 @@ public record PetDashboardDto(
         String usuarioId
 ) {
 }
-
