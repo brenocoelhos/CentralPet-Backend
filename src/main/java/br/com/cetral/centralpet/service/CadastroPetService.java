@@ -16,6 +16,7 @@ import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDate;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
@@ -75,6 +76,9 @@ public class CadastroPetService {
         pet.setFotoUrl(normalizarOpcional(dto.getFotoUrl()));
         pet.setNomeTutor(dto.getNomeTutor().trim());
         pet.setTelefoneTutor(dto.getTelefoneTutor().trim());
+        
+        // Define a data atual como a data de cadastro da publicação
+        pet.setDataCadastro(LocalDate.now());
 
         Pet petSalvo = petRepository.save(pet);
 
@@ -184,6 +188,7 @@ public class CadastroPetService {
                 pet.getCor(),
                 pet.getPorte(),
                 pet.getDataDesaparecimento(),
+                pet.getDataCadastro(), // <-- Data de cadastro mapeada aqui
                 pet.getLocalDesaparecimento(),
                 deserializarDescricao(pet.getDescricao()),
                 pet.getCastrado(),
