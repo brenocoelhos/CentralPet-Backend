@@ -27,6 +27,14 @@ public class CadastroPetService {
 
     private static final String CHIP_DELIMITER = "::";
     private static final String LEGACY_CHIP_DELIMITER = "||";
+    private static final List<String> ESPECIES_AVE = List.of(
+            "p\u00e1ssaro", "passaro", "ave", "calopsita", "papagaio",
+            "can\u00e1rio", "canario", "periquito", "caturrita"
+    );
+    private static final List<String> ESPECIES_PRINCIPAIS = List.of(
+            "cachorro", "gato", "p\u00e1ssaro", "passaro", "ave", "calopsita",
+            "papagaio", "can\u00e1rio", "canario", "periquito", "caturrita"
+    );
 
     private final PetRepository petRepository;
     private final UsuarioRepository usuarioRepository;
@@ -76,7 +84,7 @@ public class CadastroPetService {
 
     @Transactional(readOnly = true)
     public PageResponseDto<PetDashboardDto> buscarTodos(
-            String termo, String nome, String especie, String raca, String cor, String porte, String bairro, String usuarioId,
+            String termo, String nome, String especie, String grupoEspecie, String raca, String cor, String porte, String bairro, String usuarioId,
             int page, int size) {
 
         // Converte strings vazias para null — JPQL usa IS NULL para ignorar filtro
@@ -88,12 +96,17 @@ public class CadastroPetService {
         String porteFilter    = isBlank(porte)      ? null : porte.trim();
         String bairroFilter   = isBlank(bairro)     ? null : bairro.trim();
         String usuarioFilter  = isBlank(usuarioId) ? null : usuarioId.trim();
+        String grupoEspecieFilter = isBlank(grupoEspecie) ? null : grupoEspecie.trim().toUpperCase();
+        List<String> especiesGrupo = especiesDoGrupo(grupoEspecieFilter);
+        boolean usarGrupoEspecie = grupoEspecieFilter != null;
+        boolean grupoOutros = "OUTROS".equals(grupoEspecieFilter);
 
         Pageable pageable = PageRequest.of(page, size, Sort.by("criadoEm").descending());
 
         // Filtros aplicados no banco — sem carregar tudo na memória
         Page<Pet> petsPage = petRepository.buscarComFiltros(
-                termoFilter, nomeFilter, especieFilter, racaFilter, corFilter, porteFilter, bairroFilter, usuarioFilter, pageable);
+                termoFilter, nomeFilter, especieFilter, usarGrupoEspecie, grupoOutros, especiesGrupo,
+                racaFilter, corFilter, porteFilter, bairroFilter, usuarioFilter, pageable);
 
         // Batch load de imagens — 1 query para todos os pets da página (evita N+1)
         List<Long> petIds = petsPage.getContent().stream().map(Pet::getId).toList();
@@ -178,6 +191,17 @@ public class CadastroPetService {
         if (valor == null) return null;
         String cep = valor.replaceAll("\\D", "");
         return cep.isEmpty() ? null : cep;
+    }
+
+    private List<String> especiesDoGrupo(String grupoEspecie) {
+        if (grupoEspecie == null) return List.of("__sem_grupo__");
+        return switch (grupoEspecie) {
+            case "CACHORRO" -> List.of("cachorro");
+            case "GATO" -> List.of("gato");
+            case "AVE" -> ESPECIES_AVE;
+            case "OUTROS" -> ESPECIES_PRINCIPAIS;
+            default -> List.of("__grupo_desconhecido__");
+        };
     }
 
     private Double resolverLatitude(CadastroPetDto dto) {

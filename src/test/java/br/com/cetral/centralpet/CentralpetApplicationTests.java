@@ -146,6 +146,45 @@ class CentralpetApplicationTests {
 	}
 
 	@Test
+	void buscaPetsDeveFiltrarPorGrupoDeEspecie() throws Exception {
+		salvarUsuario();
+		cadastroPetService.cadastrar(criarCadastroPetDto());
+
+		CadastroPetDto coelho = criarCadastroPetDto();
+		coelho.setNome("Pipoca");
+		coelho.setEspecie("Coelho");
+		coelho.setDataDesaparecimento(LocalDate.of(2026, 4, 21));
+		cadastroPetService.cadastrar(coelho);
+
+		CadastroPetDto ave = criarCadastroPetDto();
+		ave.setNome("Louro");
+		ave.setEspecie("Calopsita");
+		ave.setDataDesaparecimento(LocalDate.of(2026, 4, 22));
+		cadastroPetService.cadastrar(ave);
+
+		HttpResponse<String> outros = enviarRequest(
+				HttpRequest.newBuilder(uri("/auth/busca-pets?grupoEspecie=OUTROS"))
+						.GET()
+						.build()
+		);
+
+		assertThat(outros.statusCode()).isEqualTo(200);
+		assertThat(outros.body()).contains("\"nome\":\"Pipoca\"");
+		assertThat(outros.body()).doesNotContain("\"nome\":\"Rex\"");
+		assertThat(outros.body()).doesNotContain("\"nome\":\"Louro\"");
+
+		HttpResponse<String> aves = enviarRequest(
+				HttpRequest.newBuilder(uri("/auth/busca-pets?grupoEspecie=AVE"))
+						.GET()
+						.build()
+		);
+
+		assertThat(aves.statusCode()).isEqualTo(200);
+		assertThat(aves.body()).contains("\"nome\":\"Louro\"");
+		assertThat(aves.body()).doesNotContain("\"nome\":\"Pipoca\"");
+	}
+
+	@Test
 	void deleteCadastroPetDeveRemoverQuandoUsuarioForODono() throws Exception {
 		salvarUsuario();
 		cadastroPetService.cadastrar(criarCadastroPetDto());

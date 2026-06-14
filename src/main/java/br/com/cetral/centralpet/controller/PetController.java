@@ -43,6 +43,7 @@ public class PetController {
             @RequestParam(required = false) String termo,
             @RequestParam(required = false) String nome,
             @RequestParam(required = false) String especie,
+            @RequestParam(required = false) String grupoEspecie,
             @RequestParam(required = false) String raca,
             @RequestParam(required = false) String cor,
             @RequestParam(required = false) String porte,
@@ -52,7 +53,7 @@ public class PetController {
             @RequestParam(defaultValue = "20") int size
     ) {
         PageResponseDto<PetDashboardDto> resultado =
-                cadastroPetService.buscarTodos(termo, nome, especie, raca, cor, porte, bairro, usuarioId, page, size);
+                cadastroPetService.buscarTodos(termo, nome, especie, grupoEspecie, raca, cor, porte, bairro, usuarioId, page, size);
         return ResponseEntity.ok(resultado);
     }
 
