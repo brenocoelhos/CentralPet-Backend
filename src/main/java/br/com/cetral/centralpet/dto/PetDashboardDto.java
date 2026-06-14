@@ -1,6 +1,7 @@
 package br.com.cetral.centralpet.dto;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.List;
 
 public record PetDashboardDto(
@@ -11,7 +12,7 @@ public record PetDashboardDto(
         String cor,
         String porte,
         LocalDate dataDesaparecimento,
-        LocalDate dataCadastro,
+        LocalDateTime dataCadastro, // Adicionado para o frontend ler a hora da publicação
         String localDesaparecimento,
         List<String> descricao,
         Boolean castrado,
