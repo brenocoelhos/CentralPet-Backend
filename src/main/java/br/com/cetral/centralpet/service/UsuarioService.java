@@ -6,6 +6,7 @@ import br.com.cetral.centralpet.repository.UsuarioRepository;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.util.UUID;
 
@@ -14,10 +15,12 @@ public class UsuarioService {
 
     private final UsuarioRepository usuarioRepository;
     private final PasswordEncoder passwordEncoder;
+    private final S3Service s3Service; // Adicionamos o serviço de upload
 
-    public UsuarioService(UsuarioRepository usuarioRepository, PasswordEncoder passwordEncoder) {
+    public UsuarioService(UsuarioRepository usuarioRepository, PasswordEncoder passwordEncoder, S3Service s3Service) {
         this.usuarioRepository = usuarioRepository;
         this.passwordEncoder = passwordEncoder;
+        this.s3Service = s3Service;
     }
 
     @Transactional
@@ -46,5 +49,25 @@ public class UsuarioService {
         usuario.setEstado(dto.getEstado());
 
         return usuarioRepository.save(usuario);
+    }
+
+    // NOVO MÉTODO PARA ATUALIZAR A FOTO
+    @Transactional
+    public String atualizarFotoPerfil(String email, MultipartFile file) {
+        Usuario usuario = usuarioRepository.findByEmail(email)
+                .orElseThrow(() -> new IllegalArgumentException("Usuário não encontrado"));
+
+        try {
+            // Faz o upload usando o seu serviço S3 já existente
+            String fotoUrl = s3Service.uploadImagem(file);
+            
+            // Atualiza o utilizador e guarda na base de dados
+            usuario.setFotoPerfil(fotoUrl);
+            usuarioRepository.save(usuario);
+            
+            return fotoUrl;
+        } catch (Exception e) {
+            throw new RuntimeException("Erro ao fazer upload da foto de perfil", e);
+        }
     }
 }
