@@ -58,7 +58,7 @@ class CentralpetApplicationTests {
 		);
 
 		assertThat(response.statusCode()).isEqualTo(200);
-		assertThat(response.body()).isEqualTo("[]");
+		assertThat(response.body()).contains("\"content\":[]");
 	}
 
 	@Test
@@ -71,7 +71,7 @@ class CentralpetApplicationTests {
 		);
 
 		assertThat(response.statusCode()).isEqualTo(200);
-		assertThat(response.body()).isEqualTo("[]");
+		assertThat(response.body()).contains("\"content\":[]");
 	}
 
 	@Test
@@ -100,6 +100,9 @@ class CentralpetApplicationTests {
 		assertThat(petSalvo.getCastrado()).isTrue();
 		assertThat(petSalvo.getVacinado()).isFalse();
 		assertThat(petSalvo.getRecompensa()).isTrue();
+		assertThat(petSalvo.getCep()).isEqualTo("36275000");
+		assertThat(petSalvo.getLatitudeDesaparecimento()).isEqualTo(-21.028056);
+		assertThat(petSalvo.getLongitudeDesaparecimento()).isEqualTo(-43.582778);
 
 		HttpResponse<String> response = enviarRequest(
 				HttpRequest.newBuilder(uri("/auth/busca-pets?usuarioId=usuario-1"))
@@ -111,6 +114,9 @@ class CentralpetApplicationTests {
 		assertThat(response.body()).contains("\"castrado\":true");
 		assertThat(response.body()).contains("\"vacinado\":false");
 		assertThat(response.body()).contains("\"recompensa\":true");
+		assertThat(response.body()).contains("\"cep\":\"36275000\"");
+		assertThat(response.body()).contains("\"latitude\":-21.028056");
+		assertThat(response.body()).contains("\"longitude\":-43.582778");
 	}
 
 	@Test
@@ -200,6 +206,9 @@ class CentralpetApplicationTests {
 		dto.setPorte("Grande");
 		dto.setDataDesaparecimento(LocalDate.of(2026, 4, 20));
 		dto.setLocalDesaparecimento("Rua das Flores, 123");
+		dto.setCep("36275000");
+		dto.setLatitude(-21.028056);
+		dto.setLongitude(-43.582778);
 		dto.setDescricao(java.util.List.of("Coleira vermelha", "Mancha na pata"));
 		dto.setCastrado(true);
 		dto.setVacinado(false);

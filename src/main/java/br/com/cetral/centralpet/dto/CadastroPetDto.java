@@ -44,6 +44,17 @@ public class CadastroPetDto {
     @Size(max = 300, message = "Local do desaparecimento deve ter no máximo 300 caracteres")
     private String localDesaparecimento;
 
+    @Pattern(regexp = "^\\d{8}$", message = "CEP deve conter 8 digitos")
+    private String cep;
+
+    @DecimalMin(value = "-90.0", message = "Latitude deve ser maior ou igual a -90")
+    @DecimalMax(value = "90.0", message = "Latitude deve ser menor ou igual a 90")
+    private Double latitude;
+
+    @DecimalMin(value = "-180.0", message = "Longitude deve ser maior ou igual a -180")
+    @DecimalMax(value = "180.0", message = "Longitude deve ser menor ou igual a 180")
+    private Double longitude;
+
     @DecimalMin(value = "-90.0", message = "Latitude do desaparecimento deve ser maior ou igual a -90")
     @DecimalMax(value = "90.0", message = "Latitude do desaparecimento deve ser menor ou igual a 90")
     private Double latitudeDesaparecimento;

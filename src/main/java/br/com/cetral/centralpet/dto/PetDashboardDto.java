@@ -22,6 +22,9 @@ public record PetDashboardDto(
         List<String> imagens,
         String nomeTutor,
         String telefoneTutor,
-        String usuarioId
+        String usuarioId,
+        String cep,
+        Double latitude,
+        Double longitude
 ) {
 }

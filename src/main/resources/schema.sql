@@ -25,6 +25,9 @@ CREATE TABLE IF NOT EXISTS pets (
     porte                 VARCHAR(20),
     data_desaparecimento  DATE,
     local_desaparecimento VARCHAR(300),
+    cep                   VARCHAR(8),
+    latitude_desaparecimento DOUBLE PRECISION,
+    longitude_desaparecimento DOUBLE PRECISION,
     descricao             TEXT,
     castrado              BOOLEAN,
     vacinado              BOOLEAN,
@@ -79,6 +82,9 @@ CREATE INDEX IF NOT EXISTS idx_pets_usuario_id
 
 CREATE INDEX IF NOT EXISTS idx_pets_busca_principal
     ON pets (usuario_id, data_desaparecimento, nome, especie);
+
+CREATE INDEX IF NOT EXISTS idx_pets_location
+    ON pets (latitude_desaparecimento, longitude_desaparecimento);
 
 CREATE INDEX IF NOT EXISTS idx_pet_tags_pet_id
     ON pet_tags (pet_id);

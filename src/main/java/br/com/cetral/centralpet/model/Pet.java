@@ -42,6 +42,15 @@ public class Pet {
     @Column(name = "local_desaparecimento", length = 300)
     private String localDesaparecimento;
 
+    @Column(length = 8)
+    private String cep;
+
+    @Column(name = "latitude_desaparecimento")
+    private Double latitudeDesaparecimento;
+
+    @Column(name = "longitude_desaparecimento")
+    private Double longitudeDesaparecimento;
+
     @Column(columnDefinition = "TEXT")
     private String descricao;
 

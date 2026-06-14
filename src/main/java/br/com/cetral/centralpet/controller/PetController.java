@@ -53,6 +53,22 @@ public class PetController {
         return ResponseEntity.ok(resultado);
     }
 
+    @GetMapping("/cadastro-pet/{petId}")
+    public ResponseEntity<PetDashboardDto> buscarCadastroPet(@PathVariable Long petId) {
+        return ResponseEntity.ok(cadastroPetService.buscarPorId(petId));
+    }
+
+    @PutMapping("/cadastro-pet/{petId}")
+    public ResponseEntity<PetDashboardDto> atualizarCadastroPet(
+            @PathVariable Long petId,
+            @Valid @RequestBody CadastroPetDto cadastroPetDto,
+            Authentication authentication
+    ) {
+        return ResponseEntity.ok(
+                cadastroPetService.atualizarCadastro(petId, cadastroPetDto, authentication.getName())
+        );
+    }
+
     @DeleteMapping("/cadastro-pet/{petId}")
     public ResponseEntity<String> deletarCadastroPet(@PathVariable Long petId, Authentication authentication) {
         cadastroPetService.deletarCadastro(petId, authentication.getName());

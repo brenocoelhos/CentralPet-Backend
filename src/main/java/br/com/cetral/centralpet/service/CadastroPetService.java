@@ -61,27 +61,14 @@ public class CadastroPetService {
 
         Pet pet = new Pet();
         pet.setUsuario(usuario);
-        pet.setNome(dto.getNome().trim());
-        pet.setEspecie(dto.getEspecie().trim());
-        pet.setRaca(normalizarOpcional(dto.getRaca()));
-        pet.setCor(normalizarOpcional(dto.getCor()));
-        pet.setPorte(normalizarOpcional(dto.getPorte()));
-        pet.setDataDesaparecimento(dto.getDataDesaparecimento());
-        pet.setLocalDesaparecimento(dto.getLocalDesaparecimento().trim());
-        pet.setDescricao(serializarDescricao(dto.getDescricao()));
-        pet.setCastrado(dto.getCastrado());
-        pet.setVacinado(dto.getVacinado());
-        pet.setRecompensa(dto.getRecompensa());
-        pet.setFotoUrl(normalizarOpcional(dto.getFotoUrl()));
-        pet.setNomeTutor(dto.getNomeTutor().trim());
-        pet.setTelefoneTutor(dto.getTelefoneTutor().trim());
+        aplicarDadosPet(pet, dto);
 
         Pet petSalvo = petRepository.save(pet);
 
         pushNotificationService.notificarPetPerdido(
                 petSalvo,
-                dto.getLatitudeDesaparecimento(),
-                dto.getLongitudeDesaparecimento()
+                resolverLatitude(dto),
+                resolverLongitude(dto)
         );
 
         return petSalvo;
@@ -131,6 +118,35 @@ public class CadastroPetService {
         );
     }
 
+    @Transactional(readOnly = true)
+    public PetDashboardDto buscarPorId(Long petId) {
+        Pet pet = petRepository.findById(petId)
+                .orElseThrow(() -> new NoSuchElementException("Pet nÃ£o encontrado"));
+
+        List<String> imagens = petImagemRepository.findAllByPetIdOrderByCriadoEmAsc(petId)
+                .stream()
+                .map(PetImagem::getUrl)
+                .toList();
+
+        return toDashboardDto(pet, imagens);
+    }
+
+    @Transactional
+    public PetDashboardDto atualizarCadastro(Long petId, CadastroPetDto dto, String emailUsuarioLogado) {
+        Pet pet = petRepository.findByIdAndUsuarioEmail(petId, emailUsuarioLogado)
+                .orElseThrow(() -> new SecurityException("VocÃª nÃ£o tem permissÃ£o para editar este cadastro"));
+
+        aplicarDadosPet(pet, dto);
+        Pet petSalvo = petRepository.save(pet);
+
+        List<String> imagens = petImagemRepository.findAllByPetIdOrderByCriadoEmAsc(petId)
+                .stream()
+                .map(PetImagem::getUrl)
+                .toList();
+
+        return toDashboardDto(petSalvo, imagens);
+    }
+
     @Transactional
     public void deletarCadastro(Long petId, String emailUsuarioLogado) {
         if (!petRepository.existsById(petId)) {
@@ -153,6 +169,40 @@ public class CadastroPetService {
         if (valor == null) return null;
         String v = valor.trim();
         return v.isEmpty() ? null : v;
+    }
+
+    private String normalizarCep(String valor) {
+        if (valor == null) return null;
+        String cep = valor.replaceAll("\\D", "");
+        return cep.isEmpty() ? null : cep;
+    }
+
+    private Double resolverLatitude(CadastroPetDto dto) {
+        return dto.getLatitude() != null ? dto.getLatitude() : dto.getLatitudeDesaparecimento();
+    }
+
+    private Double resolverLongitude(CadastroPetDto dto) {
+        return dto.getLongitude() != null ? dto.getLongitude() : dto.getLongitudeDesaparecimento();
+    }
+
+    private void aplicarDadosPet(Pet pet, CadastroPetDto dto) {
+        pet.setNome(dto.getNome().trim());
+        pet.setEspecie(dto.getEspecie().trim());
+        pet.setRaca(normalizarOpcional(dto.getRaca()));
+        pet.setCor(normalizarOpcional(dto.getCor()));
+        pet.setPorte(normalizarOpcional(dto.getPorte()));
+        pet.setDataDesaparecimento(dto.getDataDesaparecimento());
+        pet.setLocalDesaparecimento(dto.getLocalDesaparecimento().trim());
+        pet.setCep(normalizarCep(dto.getCep()));
+        pet.setLatitudeDesaparecimento(resolverLatitude(dto));
+        pet.setLongitudeDesaparecimento(resolverLongitude(dto));
+        pet.setDescricao(serializarDescricao(dto.getDescricao()));
+        pet.setCastrado(dto.getCastrado());
+        pet.setVacinado(dto.getVacinado());
+        pet.setRecompensa(dto.getRecompensa());
+        pet.setFotoUrl(normalizarOpcional(dto.getFotoUrl()));
+        pet.setNomeTutor(dto.getNomeTutor().trim());
+        pet.setTelefoneTutor(dto.getTelefoneTutor().trim());
     }
 
     private String serializarDescricao(List<String> chipsDescricao) {
@@ -194,7 +244,10 @@ public class CadastroPetService {
                 imagens,
                 pet.getNomeTutor(),
                 pet.getTelefoneTutor(),
-                pet.getUsuario() != null ? pet.getUsuario().getId() : null
+                pet.getUsuario() != null ? pet.getUsuario().getId() : null,
+                pet.getCep(),
+                pet.getLatitudeDesaparecimento(),
+                pet.getLongitudeDesaparecimento()
         );
     }
 }
