@@ -27,15 +27,25 @@ public interface PetRepository extends JpaRepository<Pet, Long> {
      * Resolve o problema de: filtros em memória + sem paginação.
      */
     @Query("SELECT p FROM Pet p WHERE " +
+            "(:termo IS NULL OR " +
+            "LOWER(p.nome) LIKE LOWER(CONCAT('%', CAST(:termo AS string), '%')) OR " +
+            "LOWER(p.raca) LIKE LOWER(CONCAT('%', CAST(:termo AS string), '%')) OR " +
+            "LOWER(p.localDesaparecimento) LIKE LOWER(CONCAT('%', CAST(:termo AS string), '%')) OR " +
+            "LOWER(p.cep) LIKE LOWER(CONCAT('%', CAST(:termo AS string), '%'))) AND " +
             "(:nome IS NULL OR LOWER(p.nome) LIKE LOWER(CONCAT('%', CAST(:nome AS string), '%'))) AND " +
             "(:especie IS NULL OR LOWER(p.especie) LIKE LOWER(CONCAT('%', CAST(:especie AS string), '%'))) AND " +
+            "(:raca IS NULL OR LOWER(p.raca) LIKE LOWER(CONCAT('%', CAST(:raca AS string), '%'))) AND " +
             "(:cor IS NULL OR LOWER(p.cor) LIKE LOWER(CONCAT('%', CAST(:cor AS string), '%'))) AND " +
             "(:porte IS NULL OR LOWER(p.porte) LIKE LOWER(CONCAT('%', CAST(:porte AS string), '%'))) AND " +
+            "(:bairro IS NULL OR LOWER(p.localDesaparecimento) LIKE LOWER(CONCAT('%', CAST(:bairro AS string), '%'))) AND " +
             "(:usuarioId IS NULL OR p.usuario.id = :usuarioId)")
-    Page<Pet> buscarComFiltros(@Param("nome") String nome,
+    Page<Pet> buscarComFiltros(@Param("termo") String termo,
+                               @Param("nome") String nome,
                                @Param("especie") String especie,
+                               @Param("raca") String raca,
                                @Param("cor") String cor,
                                @Param("porte") String porte,
+                               @Param("bairro") String bairro,
                                @Param("usuarioId") String usuarioId,
                                Pageable pageable);
 }

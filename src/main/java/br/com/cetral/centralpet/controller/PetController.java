@@ -40,16 +40,19 @@ public class PetController {
      */
     @GetMapping("/busca-pets")
     public ResponseEntity<PageResponseDto<PetDashboardDto>> buscaPets(
+            @RequestParam(required = false) String termo,
             @RequestParam(required = false) String nome,
             @RequestParam(required = false) String especie,
+            @RequestParam(required = false) String raca,
             @RequestParam(required = false) String cor,
             @RequestParam(required = false) String porte,
+            @RequestParam(required = false) String bairro,
             @RequestParam(required = false) String usuarioId,
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "20") int size
     ) {
         PageResponseDto<PetDashboardDto> resultado =
-                cadastroPetService.buscarTodos(nome, especie, cor, porte, usuarioId, page, size);
+                cadastroPetService.buscarTodos(termo, nome, especie, raca, cor, porte, bairro, usuarioId, page, size);
         return ResponseEntity.ok(resultado);
     }
 

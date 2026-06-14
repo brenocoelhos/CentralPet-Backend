@@ -76,21 +76,24 @@ public class CadastroPetService {
 
     @Transactional(readOnly = true)
     public PageResponseDto<PetDashboardDto> buscarTodos(
-            String nome, String especie, String cor, String porte, String usuarioId,
+            String termo, String nome, String especie, String raca, String cor, String porte, String bairro, String usuarioId,
             int page, int size) {
 
         // Converte strings vazias para null — JPQL usa IS NULL para ignorar filtro
+        String termoFilter    = isBlank(termo)     ? null : termo.trim();
         String nomeFilter     = isBlank(nome)      ? null : nome.trim();
         String especieFilter  = isBlank(especie)   ? null : especie.trim();
+        String racaFilter     = isBlank(raca)      ? null : raca.trim();
         String corFilter      = isBlank(cor)        ? null : cor.trim();
         String porteFilter    = isBlank(porte)      ? null : porte.trim();
+        String bairroFilter   = isBlank(bairro)     ? null : bairro.trim();
         String usuarioFilter  = isBlank(usuarioId) ? null : usuarioId.trim();
 
         Pageable pageable = PageRequest.of(page, size, Sort.by("criadoEm").descending());
 
         // Filtros aplicados no banco — sem carregar tudo na memória
         Page<Pet> petsPage = petRepository.buscarComFiltros(
-                nomeFilter, especieFilter, corFilter, porteFilter, usuarioFilter, pageable);
+                termoFilter, nomeFilter, especieFilter, racaFilter, corFilter, porteFilter, bairroFilter, usuarioFilter, pageable);
 
         // Batch load de imagens — 1 query para todos os pets da página (evita N+1)
         List<Long> petIds = petsPage.getContent().stream().map(Pet::getId).toList();

@@ -120,6 +120,32 @@ class CentralpetApplicationTests {
 	}
 
 	@Test
+	void buscaPetsDeveEncontrarPorRacaEBairro() throws Exception {
+		salvarUsuario();
+		cadastroPetService.cadastrar(criarCadastroPetDto());
+
+		HttpResponse<String> porRaca = enviarRequest(
+				HttpRequest.newBuilder(uri("/auth/busca-pets?termo=labra"))
+						.GET()
+						.build()
+		);
+
+		assertThat(porRaca.statusCode()).isEqualTo(200);
+		assertThat(porRaca.body()).contains("\"nome\":\"Rex\"");
+		assertThat(porRaca.body()).contains("\"raca\":\"Labrador\"");
+
+		HttpResponse<String> porBairro = enviarRequest(
+				HttpRequest.newBuilder(uri("/auth/busca-pets?termo=Flores"))
+						.GET()
+						.build()
+		);
+
+		assertThat(porBairro.statusCode()).isEqualTo(200);
+		assertThat(porBairro.body()).contains("\"nome\":\"Rex\"");
+		assertThat(porBairro.body()).contains("\"localDesaparecimento\":\"Rua das Flores, 123\"");
+	}
+
+	@Test
 	void deleteCadastroPetDeveRemoverQuandoUsuarioForODono() throws Exception {
 		salvarUsuario();
 		cadastroPetService.cadastrar(criarCadastroPetDto());
