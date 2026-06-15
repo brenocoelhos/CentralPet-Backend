@@ -46,12 +46,15 @@ public class LoginService {
         }
 
         String token = jwtService.gerarToken(usuario);
+        
+        // CORREÇÃO: Passando usuario.getFotoPerfil() no construtor do DTO de resposta do Login
         return new LoginResponseDto(
                 token,
                 "Bearer",
                 jwtService.getJwtExpirationMs(),
                 usuario.getNome(),
-                usuario.getEmail()
+                usuario.getEmail(),
+                usuario.getFotoPerfil()
         );
     }
 
@@ -60,7 +63,13 @@ public class LoginService {
         Usuario usuario = usuarioRepository.findByEmail(email)
                 .orElseThrow(() -> new IllegalArgumentException("Usuário não encontrado"));
 
-        return new UsuarioLogadoDto(usuario.getId(), usuario.getNome(), usuario.getEmail());
+        // CORREÇÃO: Passando usuario.getFotoPerfil() no construtor do DTO da rota /me
+        return new UsuarioLogadoDto(
+                usuario.getId(), 
+                usuario.getNome(), 
+                usuario.getEmail(), 
+                usuario.getFotoPerfil()
+        );
     }
 
     @Transactional
