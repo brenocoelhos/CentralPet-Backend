@@ -92,9 +92,9 @@ public class CadastroPetService {
         String nomeFilter     = isBlank(nome)      ? null : nome.trim();
         String especieFilter  = isBlank(especie)   ? null : especie.trim();
         String racaFilter     = isBlank(raca)      ? null : raca.trim();
-        String corFilter      = isBlank(cor)        ? null : cor.trim();
-        String porteFilter    = isBlank(porte)      ? null : porte.trim();
-        String bairroFilter   = isBlank(bairro)     ? null : bairro.trim();
+        String corFilter      = isBlank(cor)       ? null : cor.trim();
+        String porteFilter    = isBlank(porte)     ? null : porte.trim();
+        String bairroFilter   = isBlank(bairro)    ? null : bairro.trim();
         String usuarioFilter  = isBlank(usuarioId) ? null : usuarioId.trim();
         String grupoEspecieFilter = isBlank(grupoEspecie) ? null : grupoEspecie.trim().toUpperCase();
         List<String> especiesGrupo = especiesDoGrupo(grupoEspecieFilter);
@@ -137,7 +137,7 @@ public class CadastroPetService {
     @Transactional(readOnly = true)
     public PetDashboardDto buscarPorId(Long petId) {
         Pet pet = petRepository.findById(petId)
-                .orElseThrow(() -> new NoSuchElementException("Pet nÃ£o encontrado"));
+                .orElseThrow(() -> new NoSuchElementException("Pet não encontrado"));
 
         List<String> imagens = petImagemRepository.findAllByPetIdOrderByCriadoEmAsc(petId)
                 .stream()
@@ -150,7 +150,7 @@ public class CadastroPetService {
     @Transactional
     public PetDashboardDto atualizarCadastro(Long petId, CadastroPetDto dto, String emailUsuarioLogado) {
         Pet pet = petRepository.findByIdAndUsuarioEmail(petId, emailUsuarioLogado)
-                .orElseThrow(() -> new SecurityException("VocÃª nÃ£o tem permissÃ£o para editar este cadastro"));
+                .orElseThrow(() -> new SecurityException("Você não tem permissão para editar este cadastro"));
 
         aplicarDadosPet(pet, dto);
         Pet petSalvo = petRepository.save(pet);
@@ -253,6 +253,7 @@ public class CadastroPetService {
     }
 
     private PetDashboardDto toDashboardDto(Pet pet, List<String> imagens) {
+        // CORREÇÃO: Passando explicitamente o construtor completo de 22 parâmetros com a fotoPerfil do usuário!
         return new PetDashboardDto(
                 pet.getId(),
                 pet.getNome(),
@@ -261,7 +262,7 @@ public class CadastroPetService {
                 pet.getCor(),
                 pet.getPorte(),
                 pet.getDataDesaparecimento(),
-                pet.getCriadoEm() != null ? pet.getCriadoEm().toInstant() : null, // MÁGICA DO FUSO AQUI (toInstant)
+                pet.getCriadoEm() != null ? pet.getCriadoEm().toInstant() : null,
                 pet.getLocalDesaparecimento(),
                 deserializarDescricao(pet.getDescricao()),
                 pet.getCastrado(),
@@ -274,7 +275,8 @@ public class CadastroPetService {
                 pet.getUsuario() != null ? pet.getUsuario().getId() : null,
                 pet.getCep(),
                 pet.getLatitudeDesaparecimento(),
-                pet.getLongitudeDesaparecimento()
+                pet.getLongitudeDesaparecimento(),
+                pet.getUsuario() != null ? pet.getUsuario().getFotoPerfil() : null // Injetando o campo fotoTutor no final
         );
     }
 }
