@@ -55,20 +55,6 @@ public class LoginController {
         return ResponseEntity.ok(usuario);
     }
 
-    // NOVO ENDPOINT DE UPLOAD DE FOTO DE PERFIL
-    @PostMapping(value = "/perfil/foto", consumes = "multipart/form-data")
-    public ResponseEntity<Map<String, String>> uploadFotoPerfil(
-            Authentication authentication,
-            @RequestParam("file") MultipartFile file) {
-        
-        String urlFoto = usuarioService.atualizarFotoPerfil(authentication.getName(), file);
-        
-        return ResponseEntity.ok(Map.of(
-                "fotoPerfil", urlFoto,
-                "message", "Foto de perfil atualizada com sucesso"
-        ));
-    }
-
     @PostMapping("/cadastro")
     public ResponseEntity<String> cadastro(@Valid @RequestBody CadastroDto cadastroDto) {
         Usuario usuario = usuarioService.cadastrar(cadastroDto);
@@ -97,5 +83,30 @@ public class LoginController {
         String token = authHeader.substring(7);
         jwtService.invalidarToken(token);
         return ResponseEntity.ok("Logout realizado com sucesso");
+    }
+}
+
+// Criado um controller separado e seguro para a rota protegida do perfil
+@RestController
+@RequestMapping("/api/usuarios")
+class PerfilFotoController {
+
+    private final UsuarioService usuarioService;
+
+    public PerfilFotoController(UsuarioService usuarioService) {
+        this.usuarioService = usuarioService;
+    }
+
+    @PostMapping(value = "/perfil/foto", consumes = "multipart/form-data")
+    public ResponseEntity<Map<String, String>> uploadFotoPerfil(
+            Authentication authentication,
+            @RequestParam("file") MultipartFile file) {
+        
+        String urlFoto = usuarioService.atualizarFotoPerfil(authentication.getName(), file);
+        
+        return ResponseEntity.ok(Map.of(
+                "fotoPerfil", urlFoto,
+                "message", "Foto de perfil atualizada com sucesso"
+        ));
     }
 }
