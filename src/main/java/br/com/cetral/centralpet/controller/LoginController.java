@@ -86,7 +86,7 @@ public class LoginController {
     }
 }
 
-// Criado um controller separado e seguro para a rota protegida do perfil
+// Controller seguro adicionado no final para capturar e expor o erro real do Render
 @RestController
 @RequestMapping("/api/usuarios")
 class PerfilFotoController {
@@ -98,15 +98,27 @@ class PerfilFotoController {
     }
 
     @PostMapping(value = "/perfil/foto", consumes = "multipart/form-data")
-    public ResponseEntity<Map<String, String>> uploadFotoPerfil(
+    public ResponseEntity<?> uploadFotoPerfil(
             Authentication authentication,
             @RequestParam("file") MultipartFile file) {
         
-        String urlFoto = usuarioService.atualizarFotoPerfil(authentication.getName(), file);
-        
-        return ResponseEntity.ok(Map.of(
-                "fotoPerfil", urlFoto,
-                "message", "Foto de perfil atualizada com sucesso"
-        ));
+        try {
+            String urlFoto = usuarioService.atualizarFotoPerfil(authentication.getName(), file);
+            return ResponseEntity.ok(Map.of(
+                    "fotoPerfil", urlFoto,
+                    "message", "Foto de perfil actualizada com sucesso"
+            ));
+        } catch (Exception e) {
+            Throwable causaRaiz = e;
+            while (causaRaiz.getCause() != null) {
+                causaRaiz = causaRaiz.getCause();
+            }
+            
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(Map.of(
+                    "erroRealJava", e.getMessage() != null ? e.getMessage() : "NullPointerException",
+                    "causaRaiz", causaRaiz.toString(),
+                    "classeDoErro", e.getClass().getName()
+            ));
+        }
     }
 }
