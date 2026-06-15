@@ -23,6 +23,7 @@ public record PetDashboardDto(
         String nomeTutor,
         String telefoneTutor,
         String usuarioId,
+        String fotoTutor,
         String cep,
         Double latitude,
         Double longitude
