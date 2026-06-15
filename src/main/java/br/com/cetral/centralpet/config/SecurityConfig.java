@@ -46,6 +46,7 @@ public class SecurityConfig {
                                 "/auth/google",
                                 "/auth/esqueci-senha",
                                 "/auth/redefinir-senha",
+                                "/auth/usuarios/upload-perfil",
                                 "/notificacoes/token",
                                 "/h2-console/**",
                                 "/swagger-ui.html",
